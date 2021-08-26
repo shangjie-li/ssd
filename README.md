@@ -15,18 +15,18 @@ Implementation of SSD in PyTorch for PASCAL VOC detection
    ```
  - Clone this repository
    ```
-   git clone https://github.com/shangjie-li/ssd.git
+   # assume that you clone this repository into SSD_ROOT
    
-   # Assume that you clone this repository into SSD_ROOT
+   git clone https://github.com/shangjie-li/ssd.git
    ```
  - Prepare dataset
    ```
-   # By default, the dataset will be download to ~/data/VOCdevkit
+   # by default, the dataset will be download to ~/data/VOCdevkit
    
-   sh $SSD_ROOT/data/scripts/VOC2007.sh
-   sh $SSD_ROOT/data/scripts/VOC2012.sh
+   sh $SSD_ROOT/scripts/VOC2007.sh
+   sh $SSD_ROOT/scripts/VOC2012.sh
    
-   # If you change root directory of the dataset, please adjust VOC_ROOT in cfg/config.py
+   # if you change root directory of the dataset, please adjust it in cfg/config.py
    ```
 
 ## Training
