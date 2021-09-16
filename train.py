@@ -83,7 +83,7 @@ def train():
         pin_memory=True)
     p = os.path.join(args.dataset_root, 'VOC' + args.dataset_year,
         'ImageSets', 'Main', args.dataset_style + '.txt')
-    print('Loading the dataset from {}...'.format(p))
+    print('Loading dataset from {}...'.format(p))
     
     ssd_net = build_ssd(phase='train', cfg=ssd_cfg)
     if args.resume:
