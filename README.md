@@ -38,7 +38,6 @@ Implementation of SSD in PyTorch for PASCAL VOC detection
    ```
  - Run the command below
    ```
-   python train.py
    python train.py --batch_size=16 --num_workers=4
    python train.py --batch_size=16 --num_workers=4 --resume=ssd300_mAP_77.43_v2.pth
    ```
@@ -46,9 +45,8 @@ Implementation of SSD in PyTorch for PASCAL VOC detection
 ## Evaluation
  - Run the command below
    ```
-   python eval.py
-   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.6 --top_k=20 --nms_thresh=0.5
-   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.6 --top_k=20 --nms_thresh=0.5 --display=True
+   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.1 --top_k=20
+   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.1 --top_k=20 --display=True
    ```
 
 ## Application
