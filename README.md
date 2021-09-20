@@ -15,42 +15,41 @@ Implementation of SSD in PyTorch for PASCAL VOC detection
    ```
  - Clone this repository
    ```
-   # assume that you clone this repository into SSD_ROOT
-   
    git clone https://github.com/shangjie-li/ssd.git
    ```
  - Prepare dataset
    ```
-   # by default, the dataset will be download to ~/data/VOCdevkit
-   
+   # Assume that you have cloned this repository into SSD_ROOT.
    sh $SSD_ROOT/scripts/VOC2007.sh
    sh $SSD_ROOT/scripts/VOC2012.sh
    
-   # if you change root directory of the dataset, please adjust it in cfg/config.py
+   # By default, the dataset will be download to ~/data/VOCdevkit.
+   # If you change the root directory of the dataset, please make corresponding adjustments in cfg/config.py.
    ```
 
 ## Training
- - Prepare pretrained weight
+ - Prepare pretrained model
    ```
    cd $SSD_ROOT
    mkdir weights && cd weights
    wget https://s3.amazonaws.com/amdegroot-models/vgg16_reducedfc.pth
    ```
- - Run the command below
+ - Run the command below to train
    ```
+   # Start training and specify batch_size and num_workers accordingly.
    python train.py --batch_size=16 --num_workers=4
-   python train.py --batch_size=16 --num_workers=4 --resume=ssd300_mAP_77.43_v2.pth
+   
+   # Resume training and specify the model to start from.
+   python train.py --resume=weights/ssd300_13_10000.pth
    ```
  
 ## Evaluation
- - Run the command below
+ - A trained model is provided [here](https://s3.amazonaws.com/amdegroot-models/ssd300_mAP_77.43_v2.pth).
+ - Run the command below to evaluate
    ```
-   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.1 --top_k=20
-   python eval.py --trained_model=ssd300_mAP_77.43_v2.pth --conf_thresh=0.1 --top_k=20 --display=True
-   ```
-
-## Application
- - Run the command below
-   ```
-   python ssd_detector.py
+   # Evaluate on PASCAL VOC dataset and specify the model.
+   python eval.py --trained_model=weights/ssd300_mAP_77.43_v2.pth
+   
+   # Display the prediction results and filter the results by setting conf_thresh and top_k.
+   python eval.py --display=True --conf_thresh=0.5 --top_k=20
    ```

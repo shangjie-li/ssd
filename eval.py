@@ -40,10 +40,8 @@ parser.add_argument('--dataset_year', default='2007', type=str,
     help='year of dataset')
 parser.add_argument('--dataset_style', default='test', type=str,
     help='style of dataset')
-parser.add_argument('--trained_model', default='ssd300_mAP_77.43_v2.pth', type=str,
+parser.add_argument('--trained_model', default='weights/ssd300_mAP_77.43_v2.pth', type=str,
     help='file name of trained model')
-parser.add_argument('--weights_folder', default='weights', type=str,
-    help='directory for weights')
 parser.add_argument('--output_folder', default='results', type=str,
     help='directory for saving prediction results')
 parser.add_argument('--cuda', default=True, type=str2bool,
@@ -231,11 +229,11 @@ def evaluate():
     current_time = time.asctime(time.localtime(time.time()))
     pred_result_file = os.path.join(args.output_folder, current_time + '.txt')
     print('Loading dataset from {}...'.format(p))
-    print('Saving prediction result to {}...'.format(pred_result_file))
+    print('Saving prediction results to {}...'.format(pred_result_file))
     
     net = build_ssd(phase='test', cfg=ssd_cfg,
         conf_thresh=args.conf_thresh, top_k=args.top_k, nms_thresh=args.nms_thresh)
-    weights = os.path.join(args.weights_folder, args.trained_model)
+    weights = args.trained_model
     print('Starting evaluating, loading model {}...'.format(weights))
     net.load_weights(weights)
     
@@ -317,8 +315,7 @@ def evaluate():
         if args.display:
             cv2.imshow('Annotation', img_a)
             cv2.imshow('Prediction', img_p)
-            
-            # press 'Esc' to shut down, and every key else to continue
+            print('Press [Esc] to shut down or every key else to continue.')
             key = cv2.waitKey(0)
             if key == 27:
                 interrupted = True
@@ -328,7 +325,7 @@ def evaluate():
         
     if not interrupted:
         fig, ax = plt.subplots(figsize=(8, 8))
-        print('\nWriting VOC result to {}...'.format(get_voc_result_file_name()))
+        print('\nWriting VOC results to {}...'.format(get_voc_result_file_name()))
         wirte_pred_result_for_evaluation(all_boxes, dataset)
         
         aps = []

@@ -16,16 +16,17 @@ except ImportError:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
     import cv2
 
-from cfg import ssd_cfg
-from cfg import voc_classes
 from cfg import voc_mean
 from cfg import voc_root
+from cfg import voc_classes
+from cfg import ssd_cfg
+from data.augmentations import Augmentation
 from data.voc import VOCDataset
 from data.voc import VOCTransform
-from data.augmentations import Augmentation
+from utils.utils import collate
+from utils.utils import adjust_lr
 from layers.ssd import build_ssd
 from layers.multi_box_loss import MultiBoxLoss
-from utils.utils import collate, adjust_lr
 
 def str2bool(v):
     return v.lower() in ('yes', 'true', 't', '1')
@@ -38,11 +39,9 @@ parser.add_argument('--dataset_year', default='2012', type=str,
 parser.add_argument('--dataset_style', default='trainval', type=str,
     help='style of dataset')
 parser.add_argument('--resume', default=None, type=str,
-    help='file name of model to resume training from')
-parser.add_argument('--pretrained_weights', default='vgg16_reducedfc.pth', type=str,
-    help='file name of pretrained weights')
-parser.add_argument('--weights_folder', default='weights', type=str,
-    help='directory for weights')
+    help='file path of model to resume training')
+parser.add_argument('--pretrained_model', default='weights/vgg16_reducedfc.pth', type=str,
+    help='file path of pretrained model')
 parser.add_argument('--batch_size', default=16, type=int,
     help='batch size for training')
 parser.add_argument('--num_workers', default=4, type=int,
@@ -57,6 +56,10 @@ parser.add_argument('--weight_decay', default=5e-4, type=float,
     help='weight decay for SGD')
 parser.add_argument('--gamma', default=0.1, type=float,
     help='gamma update for SGD')
+parser.add_argument('--saving_folder', default='weights', type=str,
+    help='directory for saving weights')
+parser.add_argument('--saving_interval', default=10000, type=int,
+    help='interval of saving model')
 
 args = parser.parse_args()
 
@@ -68,8 +71,8 @@ if torch.cuda.is_available():
         print("WARNING: It looks like you have a CUDA device, but aren't " +
             "using CUDA. \nRun with --cuda for optimal training speed.")
             
-if not os.path.exists(args.weights_folder):
-    os.mkdir(args.weights_folder)
+if not os.path.exists(args.saving_folder):
+    os.mkdir(args.saving_folder)
     
 def train():
     dataset = VOCDataset(
@@ -87,11 +90,11 @@ def train():
     
     ssd_net = build_ssd(phase='train', cfg=ssd_cfg)
     if args.resume:
-        resume_weights = os.path.join(args.weights_folder, args.resume)
+        resume_weights = args.resume
         print('Resuming training, loading {}...'.format(resume_weights))
         ssd_net.load_weights(resume_weights)
     else:
-        vgg_weights = os.path.join(args.weights_folder, args.pretrained_weights)
+        vgg_weights = args.pretrained_model
         print('Starting training, loading pretrained model {}...'.format(vgg_weights))
         ssd_net.load_vgg_weights(vgg_weights)
         ssd_net.init_extra_weights()
@@ -115,13 +118,13 @@ def train():
     batch_iterator = iter(data_loader)
     print('\nUsing the specified args:\n', args, '\n')
     
-    for it in range(ssd_cfg['max_iter']):
-        if it != 0 and it % iter_num_per_epoch == 0:
+    for it in range(1, ssd_cfg['max_iter'] + 1):
+        if it % iter_num_per_epoch == 0:
             epoch += 1
             
         if it in ssd_cfg['lr_steps']:
             step_index += 1
-            adjust_learning_rate(optimizer, args.gamma, step_index, args.lr)
+            adjust_lr(optimizer, args.gamma, step_index, args.lr)
             
         try:
             imgs, targets = next(batch_iterator)
@@ -152,9 +155,9 @@ def train():
             print('Epoch: %s || Iter: %s || Loss: %.4f || Timer: %.4f sec.' % (
                 repr(epoch), repr(it), ll + cl, t1 - t0))
                 
-        if (it != 0 and it % 1000 == 0) or (it == ssd_cfg['max_iter'] - 1):
+        if it % args.saving_interval == 0 or it == ssd_cfg['max_iter']:
             print('Saving state, iter:', it)
-            torch.save(ssd_net.state_dict(), args.weights_folder + '/ssd300_' +
+            torch.save(ssd_net.state_dict(), args.saving_folder + '/ssd300_' +
                 repr(epoch) + '_' + repr(it) + '.pth')
 
 if __name__ == '__main__':
