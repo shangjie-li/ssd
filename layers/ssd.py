@@ -107,7 +107,7 @@ def init_param(m):
 
 class SSD(nn.Module):
     def __init__(self, phase, cfg, vgg, extra_layers, head,
-        conf_thresh=0.01, top_k=200, nms_thresh=0.5):
+        conf_thresh, top_k, nms_thresh):
         """
         Inputs:
             phase (str): 'test' or 'train'
@@ -288,7 +288,7 @@ mbox = [4, 6, 6, 6, 4, 4]
 
 def build_ssd(phase='test', cfg=ssd_cfg, conf_thresh=0.01, top_k=200, nms_thresh=0.5):
     if phase != 'test' and phase != 'train':
-        raise ValueError('Only test and train are supported.')
+        raise ValueError("Only 'test' and 'train' are supported.")
     
     vgg = build_vgg(base, 3)
     extra_layers = build_extra_layers(extras, 1024)

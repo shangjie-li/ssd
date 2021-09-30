@@ -19,13 +19,13 @@ def compute_loc_loss(loc_data, loc_targets, conf_targets):
             0 for background)
     """
     pos_mask = conf_targets > 0 # [batch_size, num_priors]
-    num_positive = pos_mask.sum()
+    n = pos_mask.sum()
     
-    mask = pos_mask.unsqueeze(-1).expand_as(loc_data) # [batch_size, num_priors, 4]
+    mask = pos_mask
     loc_data = loc_data[mask].view(-1, 4)
     loc_targets = loc_targets[mask].view(-1, 4)
     loss = F.smooth_l1_loss(loc_data, loc_targets, reduction='sum')
-    return loss / num_positive
+    return loss / n
 
 def get_cross_entropy_loss(conf_data, conf_targets):
     """
@@ -54,7 +54,7 @@ def get_cross_entropy_loss(conf_data, conf_targets):
     ce_loss = lse + x_max - x.gather(dim=1, index=conf_targets.view(-1, 1)) # [n, 1]
     return ce_loss.view(batch_size, num_priors)
 
-def compute_conf_loss(conf_data, conf_targets, neg_pos_ratio=3):
+def compute_conf_loss(conf_data, conf_targets, neg_pos_ratio):
     """
     Compute conf loss for positive and negative targets using cross entropy
     loss function.
@@ -69,19 +69,23 @@ def compute_conf_loss(conf_data, conf_targets, neg_pos_ratio=3):
             counted into loss
     """
     pos_mask = conf_targets > 0 # [batch_size, num_priors]
-    num_positive = pos_mask.sum()
+    n = pos_mask.sum()
     
     ce_loss = get_cross_entropy_loss(conf_data, conf_targets)
     ce_loss[pos_mask] = 0
     _, idx = ce_loss.sort(dim=1, descending=True)
     _, idx_rank = idx.sort(dim=1)
-    neg_mask = idx_rank < pos_mask.sum(dim=1, keepdim=True) * neg_pos_ratio
     
-    mask = pos_mask + neg_mask # [batch_size, num_priors]
-    conf_data = conf_data[mask.unsqueeze(-1).expand_as(conf_data)].view(-1, conf_data.size(-1))
+    num_priors = conf_data.size(1)
+    num_positive = pos_mask.sum(dim=1, keepdim=True)
+    num_negative = torch.min(neg_pos_ratio * num_positive, num_priors - num_positive)
+    neg_mask = idx_rank < num_negative
+    
+    mask = pos_mask + neg_mask
+    conf_data = conf_data[mask].view(-1, conf_data.size(-1))
     conf_targets = conf_targets[mask].view(-1)
     loss = F.cross_entropy(conf_data, conf_targets, reduction='sum')
-    return loss / num_positive
+    return loss / n
 
 class MultiBoxLoss(nn.Module):
     def __init__(self, cfg=ssd_cfg, iou_thresh=0.5, neg_pos_ratio=3, cuda=True):
