@@ -64,7 +64,7 @@ class VOCDataset(data.Dataset):
         root=voc_root,
         sets=[('2012', 'trainval')],
         ann_transform=VOCTransform(voc_classes),
-        augment=Augmentation(size=ssd_cfg['min_dim'], mean=voc_mean, complicated=True)):
+        augment=Augmentation(size=ssd_cfg['min_dim'], mean=voc_mean)):
         """
         Inputs:
             root (str): root directory eg. 'xxx/data/VOCdevkit'

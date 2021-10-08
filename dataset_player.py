@@ -17,12 +17,7 @@ from data.voc import draw_annotation
 from data.augmentations import Augmentation
 
 if __name__ == '__main__':
-    dataset = VOCDataset(
-        root=voc_root,
-        sets=[('2012', 'trainval')],
-        ann_transform=VOCTransform(voc_classes),
-        augment=Augmentation(size=ssd_cfg['min_dim'], mean=voc_mean, complicated=True)
-    )
+    dataset = VOCDataset(root=voc_root, sets=[('2012', 'trainval')])
     for i in range(len(dataset)):
         print('\n--------[%d/%d]--------' % (i, len(dataset)))
         print('Original Data:')

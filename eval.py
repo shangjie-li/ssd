@@ -222,7 +222,6 @@ def evaluate():
     dataset = VOCDataset(
         root=args.dataset_root,
         sets=[(args.dataset_year, args.dataset_style)],
-        ann_transform=VOCTransform(voc_classes)
     )
     p = os.path.join(args.dataset_root, 'VOC' + args.dataset_year,
         'ImageSets', 'Main', args.dataset_style + '.txt')

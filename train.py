@@ -78,8 +78,6 @@ def train():
     dataset = VOCDataset(
         root=args.dataset_root,
         sets=[(args.dataset_year, args.dataset_style)],
-        ann_transform=VOCTransform(voc_classes),
-        augment=Augmentation(size=ssd_cfg['min_dim'], mean=voc_mean, complicated=True)
     )
     data_loader = data.DataLoader(dataset, args.batch_size,
         num_workers=args.num_workers, shuffle=True, collate_fn=collate,
