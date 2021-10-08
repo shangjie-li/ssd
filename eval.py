@@ -345,12 +345,15 @@ def evaluate():
         ax.set_xticks(np.arange(0, 1.1, 0.2))
         ax.set_yticks(np.arange(0, 1.1, 0.2))
         ax.legend(bbox_to_anchor=(0, 0), loc='lower left', ncol=4)
-        ap_result_file = os.path.join(args.output_folder, current_time + '.png')
+        
+        mean_ap = np.mean(aps)
+        ap_result_file = os.path.join(args.output_folder,
+            current_time + ' mAP: {:.3f}'.format(mean_ap) + '.png')
         
         print('Saving AP results to {}...'.format(ap_result_file))
         fig.savefig(ap_result_file, dpi=100)
         
-        print('\nMean Average Precision: {:.3f}'.format(np.mean(aps)))
+        print('\nMean Average Precision: {:.3f}'.format(mean_ap))
         plt.show()
 
 if __name__ == '__main__':
