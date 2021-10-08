@@ -16,13 +16,9 @@ except ImportError:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
     import cv2
 
-from cfg import voc_mean
 from cfg import voc_root
-from cfg import voc_classes
 from cfg import ssd_cfg
-from data.augmentations import Augmentation
 from data.voc import VOCDataset
-from data.voc import VOCTransform
 from utils.utils import collate
 from utils.utils import adjust_lr
 from layers.ssd import build_ssd

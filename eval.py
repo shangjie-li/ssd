@@ -22,10 +22,8 @@ from cfg import voc_classes
 from cfg import voc_mean
 from cfg import voc_root
 from data.voc import VOCDataset
-from data.voc import VOCTransform
 from data.voc import draw_annotation
 from data.voc import draw_prediction
-from data.augmentations import Augmentation
 from layers.ssd import build_ssd
 from utils.utils import create_plot_color
 from utils.utils import smooth_data
@@ -339,7 +337,7 @@ def evaluate():
             else:
                 print('{:s}: None'.format(classname))
                 aps.append(0)
-        print('\nMean Average Precision: {:.3f}'.format(np.mean(aps)))
+        fig.canvas.set_window_title(current_time)
         ax.set_xlabel('recall')
         ax.set_ylabel('precision')
         ax.set_xlim(0, 1.0)
@@ -347,6 +345,12 @@ def evaluate():
         ax.set_xticks(np.arange(0, 1.1, 0.2))
         ax.set_yticks(np.arange(0, 1.1, 0.2))
         ax.legend(bbox_to_anchor=(0, 0), loc='lower left', ncol=4)
+        ap_result_file = os.path.join(args.output_folder, current_time + '.png')
+        
+        print('Saving AP results to {}...'.format(ap_result_file))
+        fig.savefig(ap_result_file, dpi=100)
+        
+        print('\nMean Average Precision: {:.3f}'.format(np.mean(aps)))
         plt.show()
 
 if __name__ == '__main__':

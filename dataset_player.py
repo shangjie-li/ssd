@@ -8,18 +8,14 @@ except ImportError:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
     import cv2
 
-from cfg import ssd_cfg
-from cfg import voc_classes
-from cfg import voc_mean
 from cfg import voc_root
-from data.voc import VOCDataset, VOCTransform
+from data.voc import VOCDataset
 from data.voc import draw_annotation
-from data.augmentations import Augmentation
 
 if __name__ == '__main__':
     dataset = VOCDataset(root=voc_root, sets=[('2012', 'trainval')])
     for i in range(len(dataset)):
-        print('\n--------[%d/%d]--------' % (i, len(dataset)))
+        print('\n--------[%d/%d]--------' % (i + 1, len(dataset)))
         print('Original Data:')
         img_id, img = dataset.pull_image(i)
         print(' image_id:', img_id, '\n size:', img.shape)
