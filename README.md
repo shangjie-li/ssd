@@ -6,7 +6,7 @@ Implementation of SSD in PyTorch for PASCAL VOC detection
  - This repository references [amdegroot](https://github.com/amdegroot/ssd.pytorch)'s work.
 
 ## Installation
- - Install PyTorch environment with Anaconda (Test with CUDA 9.0)
+ - Install PyTorch environment with Anaconda (Test with Ubuntu 16.04)
    ```
    conda create -n ssd python=3.6
    conda activate ssd
